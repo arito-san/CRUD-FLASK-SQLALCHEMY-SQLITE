@@ -1,9 +1,11 @@
 from flask import Flask, render_template, Response, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 import json
 
 db = SQLAlchemy()
-app = Flask(__name__, template_folder='templates')
+app = Flask(__name__, template_folder='static', static_folder='static', static_url_path='/')
+CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.sqlite3"
 
 class Students(db.Model):
@@ -11,7 +13,7 @@ class Students(db.Model):
     name = db.Column(db.String(100), nullable=False)
     birthdate = db.Column(db.String(10), nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    gender = db.Column(db.String(20), nullable=False)
+    gender = db.Column(db.Boolean, nullable=False)
     grades = db.relationship('Grades', backref='students', uselist=False, )
     def to_json(self):
         return {
@@ -106,11 +108,11 @@ def allStudents():
     students_json = [students.to_json() for students in students_obj]
     return response(201,"students",students_json, "Todos os usuários cadastrado.")
 
-def response(status,contentName, content, mensagem=False):
+def response(status,contentName, content, message=False):
     body = {}
     body[contentName] = content
-    if(mensagem):
-        body["mensagem"]=mensagem
+    if(message):
+        body["message"]=message
     return Response(json.dumps(body), status=status, mimetype="application/json")
 
 if __name__ == "__main__":
