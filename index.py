@@ -42,8 +42,10 @@ class Grades(db.Model):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
-
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        print(e)
 @app.route('/createStudents', methods=['POST'])
 def createStudents():
     body = request.get_json()
@@ -104,10 +106,12 @@ def updateStudent(cpf):
        
 @app.route('/searchAllStudents', methods=['GET'])
 def allStudents():
-    students_obj = Students.query.all()
-    students_json = [students.to_json() for students in students_obj]
-    return response(201,"students",students_json, "Todos os usuários cadastrado.")
-
+    try:
+        students_obj = Students.query.all()
+        students_json = [students.to_json() for students in students_obj]
+        return response(201,"students",students_json, "Todos os usuários cadastrado.")
+    except Exception as e:
+        print (e)
 def response(status,contentName, content, message=False):
     body = {}
     body[contentName] = content
@@ -119,4 +123,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.init_app(app)
         db.create_all()
-        app.run(host='0.0.0.0', port=80)
+        app.run(host='0.0.0.0', port=5000)
